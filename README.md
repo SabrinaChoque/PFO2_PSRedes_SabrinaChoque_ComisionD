@@ -59,3 +59,44 @@ En ella se almacenan los usuarios creados desde el cliente o el navegador.
 Podemos comprobar su existencia ejecutando en la terminal:
 dir *.db
 ![alt text]({4C4200B0-1BD1-4762-9174-9DA66AF83F8C}.png)
+
+7. Registro, Login y ruta protegida (/tareas)
+Esta sección muestra cómo crear un usuario, loguearse y acceder a la ruta protegida con Basic Auth.
+
+Endpoints:
+
+POST /registro → crea usuario (guarda contraseña hasheada, no en texto plano).
+
+POST /login → verifica credenciales.
+
+GET /tareas → requiere Basic Auth (usuario/contraseña).
+
+**Registrar usuario**:
+PowerShell:
+
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/registro `
+  -ContentType 'application/json' `
+  -Body '{ "usuario":"sabrina", "password":"1234", "nombre":"Sabrina", "email":"sabrina@example.com" }'
+  ![alt text]({4657966C-68F5-4CB5-A340-1FB7250F3046}.png)
+
+  Si /registro devuelve {"error":"usuario ya existe"} con estado 409, es correcto: ese usuario ya está creado.
+  /usuarios (GET) lista id, nombre, email — no muestra contraseñas por seguridad.
+  **Login**:
+  PowerShell:
+
+  Invoke-RestMethod -Method Post -Uri http://127.0.0.1:5000/login `
+  -ContentType 'application/json' `
+  -Body '{ "usuario":"sabrina", "password":"1234" }'
+  ![alt text]({21E5F440-8B44-4149-9BB9-4D47EB6B5500}.png)
+
+$pair = "sabrina:1234"
+$token = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes($pair))
+Invoke-RestMethod -Method Get -Uri http://127.0.0.1:5000/tareas -Headers @{ Authorization = "Basic $token" }
+![alt text]({40FE9EC8-3E1A-465A-A22A-107610932F8A}.png)
+
+opcion web:
+![alt text]({656768AF-27CD-4742-8E58-CABECFA9C0B5}.png)
+si se loguea correctamente lansa la pagina web tareas
+![alt text]({39EC452F-2C52-4F0C-9B83-516F606D0789}.png)
+
+Si /tareas devuelve 401 Unauthorized, verificá usuario/clave o probá en ventana incógnito (el navegador puede recordar credenciales viejas).
