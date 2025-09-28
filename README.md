@@ -71,6 +71,8 @@ POST /login → verifica credenciales.
 
 GET /tareas → requiere Basic Auth (usuario/contraseña).
 
+Recordar dejar corriendo el servidor con python app.py.
+
 **Registrar usuario**:
 PowerShell:
 
